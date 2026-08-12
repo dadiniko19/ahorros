@@ -158,6 +158,13 @@ export const useFinance = () => {
       .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
   };
 
+  const getTotalLoans = () => {
+    if (!data.transactions || !Array.isArray(data.transactions)) return 0;
+    return data.transactions
+      .filter(t => t.type === 'loan')
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  };
+
   const getTotalFixedExpenses = () => {
     if (!data.fixedExpenses) return 0;
     return Object.values(data.fixedExpenses).reduce((sum, amount) => sum + (parseFloat(amount) || 0), 0);
@@ -192,6 +199,7 @@ export const useFinance = () => {
 
   const getExpensesByCategory = () => {
     const categories = {};
+    if (!data.transactions || !Array.isArray(data.transactions)) return [];
     data.transactions
       .filter(t => t.type === 'expense')
       .forEach(t => {
@@ -206,6 +214,7 @@ export const useFinance = () => {
 
   const getMonthlyData = () => {
     const data_map = {};
+    if (!data.transactions || !Array.isArray(data.transactions)) return [];
     data.transactions.forEach(t => {
       const date = new Date(t.date);
       const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -215,7 +224,7 @@ export const useFinance = () => {
       const amount = parseFloat(t.amount || 0);
       if (t.type === 'income') {
         data_map[month].income += amount;
-      } else {
+      } else if (t.type === 'expense') {
         data_map[month].expense += amount;
       }
     });
@@ -238,6 +247,7 @@ export const useFinance = () => {
     getTotalIncome,
     getTotalExpense,
     getTotalFixedExpenses,
+    getTotalLoans,
     getAvailableBalance,
     getBalance,
     getTotalAccounts,

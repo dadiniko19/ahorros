@@ -1,19 +1,28 @@
 import { Trash2 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
-  'Comida': '🍔',
-  'Transporte': '🚗',
-  'Entretenimiento': '🎬',
-  'Servicios': '🏠',
+  'Comida con Natha': '🍽️',
+  'Deporte': '⚽',
+  'Lunch de oficina': '🍱',
+  'Combustible': '⛽',
+  'Viaje': '✈️',
+  'Transferencia a padres': '👨‍👩‍👧',
+  'Ofrenda': '🙏',
   'Salud': '⚕️',
-  'Educación': '📚',
-  'Compras': '🛍️',
-  'Salario': '💼',
-  'Freelance': '💻',
-  'Inversiones': '📈',
-  'Regalo': '🎁',
-  'Venta': '💰',
-  'Otros': '📌',
+  'Motocicleta': '🏍️',
+  'Temu': '📦',
+  'Rushbet': '🎲',
+  'Amazon': '📦',
+  'Celular': '📱',
+  'Abono padres': '👨‍👩‍👧',
+  'Spotify': '🎵',
+  'Apple': '🍎',
+};
+
+const PAYMENT_METHOD_ICONS = {
+  'NU': '💜',
+  'Colpatria': '🏦',
+  'Efectivo': '💵',
 };
 
 export function TransactionList({ transactions, onDelete }) {
@@ -46,33 +55,54 @@ export function TransactionList({ transactions, onDelete }) {
       {transactions.map((transaction) => (
         <div
           key={transaction.id}
-          className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          className={`flex items-center justify-between p-4 rounded-lg hover:opacity-90 transition ${
+            transaction.type === 'loan'
+              ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+              : 'bg-gray-50 dark:bg-gray-800'
+          }`}
         >
           <div className="flex items-center gap-3 flex-1">
             <span className="text-2xl">
-              {CATEGORY_ICONS[transaction.category] || '📌'}
+              {transaction.type === 'loan' ? '🤝' : CATEGORY_ICONS[transaction.category] || '📌'}
             </span>
             <div className="flex-1">
-              <p className="font-medium dark:text-white">{transaction.category}</p>
-              {transaction.description && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {transaction.description}
-                </p>
+              {transaction.type === 'loan' ? (
+                <>
+                  <p className="font-medium dark:text-white">Préstamo a {transaction.recipient}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    {formatDate(transaction.date)}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-medium dark:text-white">{transaction.category}</p>
+                  {transaction.paymentMethod && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {PAYMENT_METHOD_ICONS[transaction.paymentMethod]} {transaction.paymentMethod}
+                    </p>
+                  )}
+                  {transaction.description && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {transaction.description}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    {formatDate(transaction.date)}
+                  </p>
+                </>
               )}
-              <p className="text-xs text-gray-400 dark:text-gray-500">
-                {formatDate(transaction.date)}
-              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <p
-              className={`font-bold text-right min-w-20 ${
-                transaction.type === 'income'
-                  ? 'text-green-600 dark:text-green-400'
+              className={`font-bold text-right min-w-24 ${
+                transaction.type === 'income' || transaction.type === 'loan'
+                  ? 'text-blue-600 dark:text-blue-400'
                   : 'text-red-600 dark:text-red-400'
               }`}
             >
-              {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
+              {transaction.type === 'income' || transaction.type === 'loan' ? '-' : '-'}$
+              {transaction.amount.toLocaleString('es-CO')}
             </p>
             <button
               onClick={() => onDelete(transaction.id)}
