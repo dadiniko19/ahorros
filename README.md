@@ -1,13 +1,28 @@
 # Finance App 💰
 
-Una aplicación moderna y móvil-first para gestionar tus finanzas de forma sencilla y visual.
+Una aplicación moderna y móvil-first para gestionar tus finanzas personales de forma sencilla y visual. Diseñada especialmente para gestionar múltiples cuentas bancarias, ahorros, deudas y préstamos.
 
 ## Características ✨
 
-✅ **Dashboard Intuitivo** - Visualiza tus ingresos, gastos y saldo en tiempo real  
+### 💼 Gestión de Salario
+✅ **Salario Base + Bono** - Configurable  
+✅ **Gastos Fijos** - Arriendo y otros gastos mensuales  
+✅ **Dinero Disponible** - Calcula automáticamente el dinero que puedes dispensar  
+✅ **Dispensar Dinero** - Controla cuánto dinero usas cada mes  
+
+### 🏦 Gestión de Cuentas
+✅ **Ahorros Personales** - Saldo independiente  
+✅ **Colpatria** - 3 cuentas con saldos diferentes  
+✅ **Nu Bank** - Deuda de crédito + 2 cajas de ahorros con interés  
+✅ **Préstamo a Empresa** - Con concepto especificado  
+
+### 💳 Transacciones y Análisis
+✅ **Dashboard Intuitivo** - Salario, gastos, disponible y patrimonio neto en tiempo real  
 ✅ **Agregar Transacciones** - Registro rápido de ingresos y gastos con categorías  
 ✅ **Historial Completo** - Visualiza todas tus transacciones ordenadas por fecha  
-✅ **Gráficos Visuales** - Gráfico de pastel de gastos por categoría y gráfico de barras mensual  
+✅ **Gráficos Visuales** - Gastos por categoría y comparativa ingresos vs gastos  
+
+### 🎨 Características Generales
 ✅ **Tema Oscuro/Claro** - Cambia entre temas según prefieras  
 ✅ **Exportar Datos** - Descarga tus transacciones en formato CSV  
 ✅ **Almacenamiento Local** - Tus datos se guardan en tu dispositivo, sin servidores  
@@ -35,6 +50,19 @@ npm run dev
 Abre tu navegador en `http://localhost:5173`
 
 ## Uso 📱
+
+### Gestionar Cuentas
+
+1. Ve a la sección **Cuentas** en la navegación inferior
+2. **Salario:** Visualiza tu salario base + bono (configurable)
+3. **Dinero Disponible:** Ver cuánto dinero tienes sin usar
+4. **Dispensar Dinero:** Agrega dinero que gastes para que se descuente automáticamente
+5. **Ahorros Personales:** Edita haciendo clic en el lápiz
+6. **Gastos Fijos:** Personaliza el arriendo u otros gastos fijos
+7. **Préstamo Empresa:** Especifica el concepto (Ej: Equipos) y monto
+8. **Nu Bank:** Gestiona deuda de crédito y cajas de ahorros (2 cajas)
+9. **Colpatria:** Gestiona 3 cuentas independientes con saldos diferentes
+10. **Patrimonio Neto:** Se calcula automáticamente (Cuentas - Deudas)
 
 ### Agregar una transacción
 

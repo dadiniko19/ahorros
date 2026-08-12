@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useFinance } from './hooks/useFinance';
 import { Dashboard } from './components/Dashboard';
+import { Accounts } from './components/Accounts';
 import { TransactionForm } from './components/TransactionForm';
 import { TransactionList } from './components/TransactionList';
 import { ExpenseChart, MonthlyChart } from './components/Charts';
@@ -27,7 +28,7 @@ export default function App() {
   }, [isDark]);
 
   const handleClearData = () => {
-    localStorage.removeItem('finance_transactions');
+    localStorage.removeItem('finance_data');
     window.location.reload();
   };
 
@@ -56,9 +57,12 @@ export default function App() {
           {currentPage === 'home' && (
             <>
               <Dashboard
-                income={finance.getTotalIncome()}
-                expense={finance.getTotalExpense()}
-                balance={finance.getBalance()}
+                totalSalary={finance.getTotalSalary()}
+                expense={finance.getTotalExpense() + finance.getTotalFixedExpenses()}
+                availableBalance={finance.getAvailableBalance()}
+                totalAccounts={finance.getTotalAccounts()}
+                totalDebt={finance.getTotalDebt()}
+                netWorth={finance.getNetWorth()}
               />
               <div className="mb-4">
                 <h2 className="text-lg font-bold mb-4 dark:text-white">Últimas Transacciones</h2>
@@ -68,6 +72,18 @@ export default function App() {
                 />
               </div>
             </>
+          )}
+
+          {currentPage === 'accounts' && (
+            <Accounts
+              salary={finance.salary}
+              accounts={finance.accounts}
+              fixedExpenses={finance.fixedExpenses}
+              monthlyDispensed={finance.monthlyDispensed}
+              totalExpense={finance.getTotalExpense()}
+              onUpdateAccount={finance.updateAccount}
+              onUpdateMonthlyDispensed={finance.updateMonthlyDispensed}
+            />
           )}
 
           {currentPage === 'charts' && (

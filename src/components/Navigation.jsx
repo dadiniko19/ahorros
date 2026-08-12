@@ -1,4 +1,4 @@
-import { Home, BarChart3, Settings, Plus } from 'lucide-react';
+import { Home, BarChart3, Settings, Plus, Wallet } from 'lucide-react';
 
 export function Navigation({ currentPage, onPageChange, onAddClick }) {
   return (
@@ -10,11 +10,11 @@ export function Navigation({ currentPage, onPageChange, onAddClick }) {
         <Plus className="w-6 h-6" />
       </button>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-40">
-        <div className="flex justify-around">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-40 overflow-x-auto">
+        <div className="flex justify-around min-w-max sm:min-w-0">
           <button
             onClick={() => onPageChange('home')}
-            className={`flex-1 py-3 px-4 flex flex-col items-center gap-1 transition ${
+            className={`flex-1 py-3 px-3 flex flex-col items-center gap-1 transition whitespace-nowrap ${
               currentPage === 'home'
                 ? 'text-blue-500 border-t-2 border-blue-500'
                 : 'text-gray-500 dark:text-gray-400'
@@ -24,8 +24,19 @@ export function Navigation({ currentPage, onPageChange, onAddClick }) {
             <span className="text-xs font-medium">Inicio</span>
           </button>
           <button
+            onClick={() => onPageChange('accounts')}
+            className={`flex-1 py-3 px-3 flex flex-col items-center gap-1 transition whitespace-nowrap ${
+              currentPage === 'accounts'
+                ? 'text-blue-500 border-t-2 border-blue-500'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            <Wallet className="w-5 h-5" />
+            <span className="text-xs font-medium">Cuentas</span>
+          </button>
+          <button
             onClick={() => onPageChange('charts')}
-            className={`flex-1 py-3 px-4 flex flex-col items-center gap-1 transition ${
+            className={`flex-1 py-3 px-3 flex flex-col items-center gap-1 transition whitespace-nowrap ${
               currentPage === 'charts'
                 ? 'text-blue-500 border-t-2 border-blue-500'
                 : 'text-gray-500 dark:text-gray-400'
@@ -36,7 +47,7 @@ export function Navigation({ currentPage, onPageChange, onAddClick }) {
           </button>
           <button
             onClick={() => onPageChange('settings')}
-            className={`flex-1 py-3 px-4 flex flex-col items-center gap-1 transition ${
+            className={`flex-1 py-3 px-3 flex flex-col items-center gap-1 transition whitespace-nowrap ${
               currentPage === 'settings'
                 ? 'text-blue-500 border-t-2 border-blue-500'
                 : 'text-gray-500 dark:text-gray-400'
