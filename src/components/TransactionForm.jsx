@@ -9,18 +9,13 @@ const CATEGORIES_INCOME = [
 ];
 
 const CATEGORIES_EXPENSE = [
-  'Comida con Natha',
-  'Deporte',
-  'Lunch de oficina',
-  'Combustible',
-  'Viaje',
-  'Transferencia a padres',
-  'Ofrenda',
-  'Salud',
-  'Motocicleta',
-  'Temu',
-  'Rushbet',
-  'Amazon',
+  'Comida',
+  'Uber',
+  'Eventos',
+  'Servicios',
+  'Entretenimiento',
+  'Gastos para mi',
+  'Bobadas',
 ];
 
 const PAYMENT_METHODS = [
