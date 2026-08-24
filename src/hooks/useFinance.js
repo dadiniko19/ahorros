@@ -202,14 +202,30 @@ export const useFinance = () => {
       type: 'transfer',
       ...transfer,
     };
-    setData(prev => ({
-      ...prev,
-      transactions: [newTransfer, ...prev.transactions],
-    }));
 
-    // Update account balances
-    updateAccountBalance(transfer.fromAccount, -transfer.amount);
-    updateAccountBalance(transfer.toAccount, transfer.amount);
+    setData(prev => {
+      let newData = { ...prev, transactions: [newTransfer, ...prev.transactions] };
+
+      // Update account balances
+      const updateBalance = (accountId, amount) => {
+        const [type, index] = accountId.split('_');
+
+        if (type === 'nu') {
+          newData.accounts.nubank.savingsBoxes[parseInt(index)].balance += amount;
+        } else if (type === 'nequi') {
+          newData.accounts.nequi.balance += amount;
+        } else if (type === 'colpatria') {
+          newData.accounts.colpatria[parseInt(index)].balance += amount;
+        } else if (type === 'cash') {
+          newData.accounts.cash.balance += amount;
+        }
+      };
+
+      updateBalance(transfer.fromAccount, -transfer.amount);
+      updateBalance(transfer.toAccount, transfer.amount);
+
+      return newData;
+    });
   };
 
   const updateAccountBalance = (accountId, amount) => {

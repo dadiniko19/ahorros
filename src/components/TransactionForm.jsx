@@ -17,7 +17,8 @@ const PAYMENT_METHODS = [
 ];
 
 export function TransactionForm({ onAdd, isOpen, onClose }) {
-  const { EXPENSE_CATEGORIES } = useFinance();
+  const finance = useFinance();
+  const { EXPENSE_CATEGORIES, accounts } = finance;
   const [transactionType, setTransactionType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
@@ -29,18 +30,68 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
   // Para préstamos
   const [loanRecipient, setLoanRecipient] = useState('');
 
+  // Para transferencias entre cuentas
+  const [fromAccount, setFromAccount] = useState('');
+  const [toAccount, setToAccount] = useState('');
+
   const expenseCategories = Object.entries(EXPENSE_CATEGORIES).map(([key, val]) => ({
     key,
     ...val,
   }));
 
-  const categories = transactionType === 'income' ? CATEGORIES_INCOME : expenseCategories;
-  const showPaymentMethod = transactionType !== 'loan';
+  const isTransfer = transactionType === 'transfer';
   const isLoan = transactionType === 'loan';
+  const categories = transactionType === 'income' ? CATEGORIES_INCOME : expenseCategories;
+  const showPaymentMethod = !isTransfer && !isLoan;
 
   const currentSubcategories = category && transactionType === 'expense'
     ? EXPENSE_CATEGORIES[category]?.subcategories || []
     : [];
+
+  // Obtener lista de cuentas disponibles
+  const getAvailableAccounts = () => {
+    const accs = [];
+
+    if (accounts.nubank?.savingsBoxes) {
+      accounts.nubank.savingsBoxes.forEach((box, idx) => {
+        accs.push({
+          id: `nu_${idx}`,
+          name: box.name,
+          balance: box.balance,
+        });
+      });
+    }
+
+    if (accounts.nequi?.balance >= 0) {
+      accs.push({
+        id: 'nequi',
+        name: 'Nequi',
+        balance: accounts.nequi.balance,
+      });
+    }
+
+    if (accounts.cash?.balance >= 0) {
+      accs.push({
+        id: 'cash',
+        name: 'Efectivo',
+        balance: accounts.cash.balance,
+      });
+    }
+
+    if (accounts.colpatria) {
+      accounts.colpatria.forEach((acc, idx) => {
+        accs.push({
+          id: `colpatria_${idx}`,
+          name: acc.name,
+          balance: acc.balance,
+        });
+      });
+    }
+
+    return accs;
+  };
+
+  const availableAccounts = getAvailableAccounts();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,7 +101,28 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
       return;
     }
 
-    if (isLoan) {
+    if (isTransfer) {
+      if (!fromAccount) {
+        alert('Selecciona cuenta de origen');
+        return;
+      }
+      if (!toAccount) {
+        alert('Selecciona cuenta de destino');
+        return;
+      }
+      if (fromAccount === toAccount) {
+        alert('La cuenta origen y destino deben ser diferentes');
+        return;
+      }
+
+      onAdd({
+        type: 'transfer',
+        amount: parseFloat(amount),
+        fromAccount,
+        toAccount,
+        description,
+      });
+    } else if (isLoan) {
       if (!loanRecipient) {
         alert('Por favor especifica a quién le prestaste');
         return;
@@ -90,6 +162,8 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
     setPaymentMethod('');
     setDescription('');
     setLoanRecipient('');
+    setFromAccount('');
+    setToAccount('');
     setNoShowUpdates(false);
     setTransactionType('expense');
     onClose();
@@ -145,6 +219,20 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
             <button
               type="button"
               onClick={() => {
+                setTransactionType('transfer');
+                setCategory('');
+              }}
+              className={`flex-1 py-2 rounded-lg font-medium transition ${
+                transactionType === 'transfer'
+                  ? 'bg-purple-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              Transferir
+            </button>
+            <button
+              type="button"
+              onClick={() => {
                 setTransactionType('loan');
                 setCategory('');
               }}
@@ -172,7 +260,45 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
             />
           </div>
 
-          {isLoan ? (
+          {isTransfer ? (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                  Cuenta de Origen *
+                </label>
+                <select
+                  value={fromAccount}
+                  onChange={(e) => setFromAccount(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecciona cuenta</option>
+                  {availableAccounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.name} (${acc.balance.toLocaleString('es-CO')})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                  Cuenta de Destino *
+                </label>
+                <select
+                  value={toAccount}
+                  onChange={(e) => setToAccount(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecciona cuenta</option>
+                  {availableAccounts.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.name} (${acc.balance.toLocaleString('es-CO')})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          ) : isLoan ? (
             <div>
               <label className="block text-sm font-medium mb-1 dark:text-gray-300">
                 ¿A quién le prestaste? *
@@ -289,7 +415,7 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
               type="submit"
               className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition"
             >
-              Agregar {isLoan ? 'Préstamo' : 'Transacción'}
+              Agregar {isTransfer ? 'Transferencia' : isLoan ? 'Préstamo' : 'Transacción'}
             </button>
             <button
               type="button"
