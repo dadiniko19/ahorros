@@ -504,6 +504,7 @@ export const useFinance = () => {
     updateSalary,
     updateCreditBalance,
     deductArriendo,
+    deductFixedExpense,
     getTotalSalary,
     getTotalIncome,
     getTotalExpense,
