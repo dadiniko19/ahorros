@@ -386,6 +386,72 @@ export const useFinance = () => {
     }));
   };
 
+  const addExpenseTransaction = (transaction) => {
+    const { amount, paymentMethod, category, subcategory, description } = transaction;
+    setData(prev => {
+      const newTransaction = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'expense',
+        category,
+        subcategory,
+        amount,
+        paymentMethod,
+        description,
+      };
+
+      let newData = { ...prev, transactions: [newTransaction, ...prev.transactions] };
+
+      if (paymentMethod === 'Nequi') {
+        newData.accounts.nequi.balance -= amount;
+      } else if (paymentMethod === 'Efectivo') {
+        newData.accounts.cash.balance -= amount;
+      } else if (paymentMethod === 'Colpatria') {
+        newData.accounts.colpatria[0].balance -= amount;
+      } else if (paymentMethod === 'NU') {
+        if (newData.accounts.nubank.savingsBoxes[0]) {
+          newData.accounts.nubank.savingsBoxes[0].balance -= amount;
+        }
+      }
+
+      return newData;
+    });
+  };
+
+  const addPaymentToDebt = (transaction) => {
+    const { amount, paymentMethod } = transaction;
+    setData(prev => {
+      const newTransaction = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'payment',
+        category: 'abono',
+        subcategory: 'Abono a Deuda',
+        amount,
+        paymentMethod,
+        description: `Abono a lo que debo`,
+      };
+
+      let newData = { ...prev, transactions: [newTransaction, ...prev.transactions] };
+
+      if (paymentMethod === 'Nequi') {
+        newData.accounts.nequi.balance -= amount;
+      } else if (paymentMethod === 'Efectivo') {
+        newData.accounts.cash.balance -= amount;
+      } else if (paymentMethod === 'Colpatria') {
+        newData.accounts.colpatria[0].balance -= amount;
+      } else if (paymentMethod === 'NU') {
+        if (newData.accounts.nubank.savingsBoxes[0]) {
+          newData.accounts.nubank.savingsBoxes[0].balance -= amount;
+        }
+      }
+
+      newData.accounts.nubank.creditBalance -= amount;
+
+      return newData;
+    });
+  };
+
   const getTotalSalary = () => {
     return data.salary.base + data.salary.bonus;
   };
@@ -505,6 +571,8 @@ export const useFinance = () => {
     updateCreditBalance,
     deductArriendo,
     deductFixedExpense,
+    addExpenseTransaction,
+    addPaymentToDebt,
     getTotalSalary,
     getTotalIncome,
     getTotalExpense,

@@ -57,7 +57,7 @@ export default function App() {
           {currentPage === 'home' && (
             <>
               <Dashboard
-                totalSalary={finance.getTotalSalary()}
+                totalSalary={(finance.accounts.nequi?.balance || 0) + (finance.accounts.cash?.balance || 0) + (finance.accounts.colpatria[0]?.balance || 0)}
                 expense={finance.getTotalExpense() + finance.getTotalFixedExpenses()}
                 availableBalance={finance.getAvailableBalance()}
                 totalAccounts={finance.getTotalAccounts()}
@@ -133,6 +133,8 @@ export default function App() {
         isOpen={showForm}
         onClose={() => setShowForm(false)}
         onAdd={finance.addTransaction}
+        onAddExpense={finance.addExpenseTransaction}
+        onAddPayment={finance.addPaymentToDebt}
       />
       <Navigation
         currentPage={currentPage}

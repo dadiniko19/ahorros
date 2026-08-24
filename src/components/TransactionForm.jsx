@@ -16,7 +16,7 @@ const PAYMENT_METHODS = [
   'Efectivo',
 ];
 
-export function TransactionForm({ onAdd, isOpen, onClose }) {
+export function TransactionForm({ onAdd, isOpen, onClose, onAddExpense, onAddPayment }) {
   const finance = useFinance();
   const { EXPENSE_CATEGORIES, accounts } = finance;
   const [transactionType, setTransactionType] = useState('expense');
@@ -41,6 +41,7 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
 
   const isTransfer = transactionType === 'transfer';
   const isLoan = transactionType === 'loan';
+  const isPayment = transactionType === 'payment';
   const categories = transactionType === 'income' ? CATEGORIES_INCOME : expenseCategories;
   const showPaymentMethod = !isTransfer && !isLoan;
 
@@ -132,6 +133,16 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
         amount: parseFloat(amount),
         recipient: loanRecipient,
       });
+    } else if (isPayment) {
+      if (!paymentMethod) {
+        alert('Por favor selecciona el método de pago');
+        return;
+      }
+      onAddPayment({
+        amount: parseFloat(amount),
+        paymentMethod,
+        description,
+      });
     } else {
       if (!category) {
         alert('Por favor selecciona una categoría');
@@ -146,14 +157,24 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
         return;
       }
 
-      onAdd({
-        type: transactionType,
-        amount: parseFloat(amount),
-        category: transactionType === 'expense' ? category : category,
-        subcategory: transactionType === 'expense' ? subcategory : undefined,
-        paymentMethod,
-        description,
-      });
+      if (transactionType === 'expense') {
+        onAddExpense({
+          amount: parseFloat(amount),
+          category,
+          subcategory,
+          paymentMethod,
+          description,
+        });
+      } else {
+        onAdd({
+          type: transactionType,
+          amount: parseFloat(amount),
+          category: transactionType === 'expense' ? category : category,
+          subcategory: transactionType === 'expense' ? subcategory : undefined,
+          paymentMethod,
+          description,
+        });
+      }
     }
 
     setAmount('');
@@ -244,6 +265,20 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
             >
               Préstamo
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTransactionType('payment');
+                setCategory('');
+              }}
+              className={`flex-1 py-2 rounded-lg font-medium transition ${
+                transactionType === 'payment'
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              Abono
+            </button>
           </div>
 
           <div>
@@ -310,6 +345,24 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
                 placeholder="Nombre de la persona"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+          ) : isPayment ? (
+            <div>
+              <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                Método de Pago *
+              </label>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Selecciona método</option>
+                {PAYMENT_METHODS.map((method) => (
+                  <option key={method} value={method}>
+                    {method}
+                  </option>
+                ))}
+              </select>
             </div>
           ) : (
             <>
