@@ -402,17 +402,7 @@ export const useFinance = () => {
 
       let newData = { ...prev, transactions: [newTransaction, ...prev.transactions] };
 
-      if (paymentMethod === 'Nequi') {
-        newData.accounts.nequi.balance -= amount;
-      } else if (paymentMethod === 'Efectivo') {
-        newData.accounts.cash.balance -= amount;
-      } else if (paymentMethod === 'Colpatria') {
-        newData.accounts.colpatria[0].balance -= amount;
-      } else if (paymentMethod === 'NU') {
-        if (newData.accounts.nubank.savingsBoxes[0]) {
-          newData.accounts.nubank.savingsBoxes[0].balance -= amount;
-        }
-      }
+      newData.accounts.colpatria[0].balance -= amount;
 
       return newData;
     });
@@ -434,18 +424,7 @@ export const useFinance = () => {
 
       let newData = { ...prev, transactions: [newTransaction, ...prev.transactions] };
 
-      if (paymentMethod === 'Nequi') {
-        newData.accounts.nequi.balance -= amount;
-      } else if (paymentMethod === 'Efectivo') {
-        newData.accounts.cash.balance -= amount;
-      } else if (paymentMethod === 'Colpatria') {
-        newData.accounts.colpatria[0].balance -= amount;
-      } else if (paymentMethod === 'NU') {
-        if (newData.accounts.nubank.savingsBoxes[0]) {
-          newData.accounts.nubank.savingsBoxes[0].balance -= amount;
-        }
-      }
-
+      newData.accounts.colpatria[0].balance -= amount;
       newData.accounts.nubank.creditBalance -= amount;
 
       return newData;
