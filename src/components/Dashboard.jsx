@@ -30,32 +30,6 @@ export function Dashboard({
           </div>
         </div>
 
-        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Saldo de Nu</p>
-              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                ${safe(nuBankBalance).toLocaleString('es-CO')}
-              </p>
-              {safe(totalYield) > 0 && (
-                <p className="text-xs text-purple-500 mt-1">Rendimiento: ${safe(totalYield).toLocaleString('es-CO')}</p>
-              )}
-            </div>
-            <Zap className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-          </div>
-        </div>
-
-        <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Gastos del Mes</p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                ${safe(expense).toLocaleString('es-CO')}
-              </p>
-            </div>
-            <TrendingDown className="w-8 h-8 text-red-600 dark:text-red-400" />
-          </div>
-        </div>
 
         <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
           <div className="flex items-center justify-between">
@@ -105,17 +79,6 @@ export function Dashboard({
           </div>
         )}
 
-        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Patrimonio Neto</p>
-              <p className={`text-2xl font-bold ${safe(netWorth) >= 0 ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'}`}>
-                ${safe(netWorth).toLocaleString('es-CO')}
-              </p>
-            </div>
-            <Wallet className={`w-8 h-8 ${safe(netWorth) >= 0 ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'}`} />
-          </div>
-        </div>
       </div>
     </div>
   );
