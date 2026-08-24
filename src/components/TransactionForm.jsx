@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
+import { useFinance } from '../hooks/useFinance';
 
 const CATEGORIES_INCOME = [
   'Celular',
@@ -8,35 +9,38 @@ const CATEGORIES_INCOME = [
   'Apple',
 ];
 
-const CATEGORIES_EXPENSE = [
-  'Comida',
-  'Uber',
-  'Eventos',
-  'Servicios',
-  'Entretenimiento',
-  'Gastos para mi',
-  'Bobadas',
-];
-
 const PAYMENT_METHODS = [
   'NU',
+  'Nequi',
   'Colpatria',
   'Efectivo',
 ];
 
 export function TransactionForm({ onAdd, isOpen, onClose }) {
+  const { EXPENSE_CATEGORIES } = useFinance();
   const [transactionType, setTransactionType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
+  const [subcategory, setSubcategory] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [description, setDescription] = useState('');
+  const [noShowUpdates, setNoShowUpdates] = useState(false);
 
   // Para préstamos
   const [loanRecipient, setLoanRecipient] = useState('');
 
-  const categories = transactionType === 'income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE;
+  const expenseCategories = Object.entries(EXPENSE_CATEGORIES).map(([key, val]) => ({
+    key,
+    ...val,
+  }));
+
+  const categories = transactionType === 'income' ? CATEGORIES_INCOME : expenseCategories;
   const showPaymentMethod = transactionType !== 'loan';
   const isLoan = transactionType === 'loan';
+
+  const currentSubcategories = category && transactionType === 'expense'
+    ? EXPENSE_CATEGORIES[category]?.subcategories || []
+    : [];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -61,6 +65,10 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
         alert('Por favor selecciona una categoría');
         return;
       }
+      if (transactionType === 'expense' && !subcategory) {
+        alert('Por favor selecciona una subcategoría');
+        return;
+      }
       if (!paymentMethod) {
         alert('Por favor selecciona el método de pago');
         return;
@@ -69,7 +77,8 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
       onAdd({
         type: transactionType,
         amount: parseFloat(amount),
-        category,
+        category: transactionType === 'expense' ? category : category,
+        subcategory: transactionType === 'expense' ? subcategory : undefined,
         paymentMethod,
         description,
       });
@@ -77,9 +86,11 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
 
     setAmount('');
     setCategory('');
+    setSubcategory('');
     setPaymentMethod('');
     setDescription('');
     setLoanRecipient('');
+    setNoShowUpdates(false);
     setTransactionType('expense');
     onClose();
   };
@@ -178,21 +189,52 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
             <>
               <div>
                 <label className="block text-sm font-medium mb-1 dark:text-gray-300">
-                  {transactionType === 'income' ? 'Tipo de Ingreso' : 'Concepto de Gasto'} *
+                  {transactionType === 'income' ? 'Tipo de Ingreso' : 'Categoría Principal'} *
                 </label>
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setSubcategory('');
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Selecciona una opción</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
+                  {transactionType === 'income' ? (
+                    CATEGORIES_INCOME.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))
+                  ) : (
+                    expenseCategories.map((cat) => (
+                      <option key={cat.key} value={cat.key}>
+                        {cat.name}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
+
+              {transactionType === 'expense' && currentSubcategories.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                    Subcategoría *
+                  </label>
+                  <select
+                    value={subcategory}
+                    onChange={(e) => setSubcategory(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Selecciona una opción</option>
+                    {currentSubcategories.map((subcat) => (
+                      <option key={subcat} value={subcat}>
+                        {subcat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {showPaymentMethod && (
                 <div>
@@ -225,6 +267,19 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
                   placeholder="Ej: Detalles adicionales"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="noShowUpdates"
+                  checked={noShowUpdates}
+                  onChange={(e) => setNoShowUpdates(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
+                />
+                <label htmlFor="noShowUpdates" className="text-sm text-gray-600 dark:text-gray-400">
+                  No mostrar en historial
+                </label>
               </div>
             </>
           )}

@@ -63,6 +63,11 @@ export default function App() {
                 totalAccounts={finance.getTotalAccounts()}
                 totalDebt={finance.getTotalDebt()}
                 netWorth={finance.getNetWorth()}
+                nuBankBalance={finance.accounts.nubank.savingsBoxes.reduce((sum, box) => sum + box.balance, 0)}
+                motoExpense={finance.getMotoExpense()}
+                motoBudget={finance.budgets.moto}
+                dailyLimit={finance.dailyLimit}
+                totalYield={finance.getTotalYield()}
               />
               <div className="mb-4">
                 <h2 className="text-lg font-bold mb-4 dark:text-white">Últimas Transacciones</h2>
@@ -79,10 +84,12 @@ export default function App() {
               salary={finance.salary}
               accounts={finance.accounts}
               fixedExpenses={finance.fixedExpenses}
-              monthlyDispensed={finance.monthlyDispensed}
+              budgets={finance.budgets}
+              dailyLimit={finance.dailyLimit}
               totalExpense={finance.getTotalExpense()}
-              onUpdateAccount={finance.updateAccount}
-              onUpdateMonthlyDispensed={finance.updateMonthlyDispensed}
+              onUpdateFixedExpense={finance.updateFixedExpense}
+              onUpdateBudget={finance.updateBudget}
+              onUpdateDailyLimit={finance.updateDailyLimit}
             />
           )}
 

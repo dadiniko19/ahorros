@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Zap } from 'lucide-react';
 
 export function Dashboard({
   totalSalary = 0,
@@ -6,7 +6,12 @@ export function Dashboard({
   availableBalance = 0,
   totalAccounts = 0,
   totalDebt = 0,
-  netWorth = 0
+  netWorth = 0,
+  nuBankBalance = 0,
+  motoExpense = 0,
+  motoBudget = 0,
+  dailyLimit = 0,
+  totalYield = 0,
 }) {
   const safe = (value) => isNaN(value) ? 0 : value;
 
@@ -25,6 +30,21 @@ export function Dashboard({
           </div>
         </div>
 
+        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Saldo de Nu</p>
+              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                ${safe(nuBankBalance).toLocaleString('es-CO')}
+              </p>
+              {safe(totalYield) > 0 && (
+                <p className="text-xs text-purple-500 mt-1">Rendimiento: ${safe(totalYield).toLocaleString('es-CO')}</p>
+              )}
+            </div>
+            <Zap className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+          </div>
+        </div>
+
         <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
           <div className="flex items-center justify-between">
             <div>
@@ -37,10 +57,35 @@ export function Dashboard({
           </div>
         </div>
 
+        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Gasto de Moto</p>
+              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                ${safe(motoExpense).toLocaleString('es-CO')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {safe(motoBudget) > 0 && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Presupuesto de Moto</p>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                ${safe(motoBudget).toLocaleString('es-CO')}
+              </p>
+              <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                Disponible: ${Math.max(0, safe(motoBudget) - safe(motoExpense)).toLocaleString('es-CO')}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className={`${safe(availableBalance) >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-orange-50 dark:bg-orange-900/20'} rounded-lg p-4 border ${safe(availableBalance) >= 0 ? 'border-blue-200 dark:border-blue-800' : 'border-orange-200 dark:border-orange-800'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Disponible</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Dinero Disponible</p>
               <p className={`text-2xl font-bold ${safe(availableBalance) >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}>
                 ${safe(availableBalance).toLocaleString('es-CO')}
               </p>
@@ -48,6 +93,17 @@ export function Dashboard({
             <Wallet className={`w-8 h-8 ${safe(availableBalance) >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`} />
           </div>
         </div>
+
+        {safe(dailyLimit) > 0 && (
+          <div className="bg-cyan-50 dark:bg-cyan-900/20 rounded-lg p-4 border border-cyan-200 dark:border-cyan-800">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Límite Diario</p>
+              <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                ${safe(dailyLimit).toLocaleString('es-CO')}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
           <div className="flex items-center justify-between">

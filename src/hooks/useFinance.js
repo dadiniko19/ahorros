@@ -2,6 +2,65 @@ import { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'finance_data';
 
+const EXPENSE_CATEGORIES = {
+  alimentacion: {
+    name: '🍔 Alimentación',
+    subcategories: [
+      'Restaurantes',
+      'Domicilios',
+      'Comida con Natha',
+      'Snacks trabajo',
+      'Snacks fuera del trabajo',
+    ],
+  },
+  transporte: {
+    name: '🚗 Transporte',
+    subcategories: [
+      'Uber',
+      'TransMilenio',
+      'Gasolina',
+    ],
+  },
+  moto: {
+    name: '🏍️ Moto',
+    subcategories: [
+      'Mantenimiento',
+      'Repuestos',
+      'Lavado',
+      'Accesorios',
+      'SOAT',
+      'Tecnomecánica',
+    ],
+  },
+  diversión: {
+    name: '🎮 Diversión',
+    subcategories: [
+      'Fútbol',
+      'Salidas con amigos',
+      'Bolirana',
+      'Playland',
+      'Rodadas',
+    ],
+  },
+  futbol: {
+    name: '⚽ Fútbol',
+    subcategories: [
+      'Estadio',
+      'Partido',
+      'Equipamiento',
+      'Suscripciones',
+    ],
+  },
+  rushbet: {
+    name: '🎰 RushBet',
+    subcategories: [
+      'Depósitos',
+      'Pérdidas',
+      'Ganancias',
+    ],
+  },
+};
+
 const DEFAULT_STATE = {
   transactions: [],
   salary: {
@@ -10,10 +69,9 @@ const DEFAULT_STATE = {
   },
   accounts: {
     savings: 0,
-    companyLoan: {
-      name: 'Préstamo Empresa',
+    nequi: {
+      name: 'Nequi',
       balance: 0,
-      concept: '',
     },
     nubank: {
       name: 'Nu Bank',
@@ -21,8 +79,10 @@ const DEFAULT_STATE = {
       creditBalance: 0,
       creditLimit: 0,
       savingsBoxes: [
-        { name: 'Caja de Ahorros 1', balance: 0, interestRate: 0 },
-        { name: 'Caja de Ahorros 2', balance: 0, interestRate: 0 },
+        { name: 'Caja de Ahorros 1', balance: 2267846.69, yield: 512349.69, yieldRate: 9.3 },
+        { name: 'Caja de Ahorros 2', balance: 5367578.34, yield: 575187.44, yieldRate: 9.3 },
+        { name: 'Caja de Ahorros 3', balance: 12296056.24, yield: 390056.24, yieldRate: 9.3 },
+        { name: 'Caja de Natha', balance: 1493467.86, yield: 642798.89, yieldRate: 9.3 },
       ],
     },
     colpatria: [
@@ -30,11 +90,29 @@ const DEFAULT_STATE = {
       { name: 'Colpatria Cuenta 2', balance: 0 },
       { name: 'Colpatria Cuenta 3', balance: 0 },
     ],
+    cash: {
+      name: 'Efectivo',
+      balance: 0,
+    },
+    companyLoan: {
+      name: 'Préstamo Empresa',
+      balance: 0,
+      concept: '',
+    },
   },
   fixedExpenses: {
     rent: 1500000,
+    spotify: 0,
+    claro: 0,
+    icloud: 0,
+    didi: 0,
+    rappi: 0,
+  },
+  budgets: {
+    moto: 0,
   },
   monthlyDispensed: 0,
+  dailyLimit: 0,
 };
 
 export const useFinance = () => {
@@ -46,7 +124,6 @@ export const useFinance = () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        // Merge con datos por defecto para asegurar que tiene la estructura correcta
         setData(prev => ({
           ...DEFAULT_STATE,
           ...parsed,
@@ -67,6 +144,10 @@ export const useFinance = () => {
           salary: {
             ...DEFAULT_STATE.salary,
             ...(parsed.salary || {}),
+          },
+          budgets: {
+            ...DEFAULT_STATE.budgets,
+            ...(parsed.budgets || {}),
           },
         }));
       } catch (e) {
@@ -101,42 +182,66 @@ export const useFinance = () => {
     }));
   };
 
-  const editTransaction = (id, updates) => {
+  const addTransfer = (transfer) => {
+    const newTransfer = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      type: 'transfer',
+      ...transfer,
+    };
     setData(prev => ({
       ...prev,
-      transactions: prev.transactions.map(t =>
-        t.id === id ? { ...t, ...updates } : t
-      ),
+      transactions: [newTransfer, ...prev.transactions],
     }));
+
+    // Update account balances
+    updateAccountBalance(transfer.fromAccount, -transfer.amount);
+    updateAccountBalance(transfer.toAccount, transfer.amount);
   };
 
-  const updateAccount = (accountType, value, index = null, concept = null) => {
+  const updateAccountBalance = (accountId, amount) => {
     setData(prev => {
       const newData = { ...prev };
-      if (accountType === 'savings') {
-        newData.accounts.savings = value;
-      } else if (accountType === 'nubank-credit') {
-        newData.accounts.nubank.creditBalance = value;
-      } else if (accountType === 'nubank-box' && index !== null) {
-        newData.accounts.nubank.savingsBoxes[index].balance = value;
-      } else if (accountType === 'company-loan') {
-        newData.accounts.companyLoan.balance = value;
-        if (concept) {
-          newData.accounts.companyLoan.concept = concept;
-        }
-      } else if (accountType === 'colpatria' && index !== null) {
-        newData.accounts.colpatria[index].balance = value;
-      } else if (accountType === 'rent') {
-        newData.fixedExpenses.rent = value;
+      const [type, index] = accountId.split('_');
+
+      if (type === 'nubank') {
+        newData.accounts.nubank.creditBalance += amount;
+      } else if (type === 'nequi') {
+        newData.accounts.nequi.balance += amount;
+      } else if (type === 'colpatria') {
+        newData.accounts.colpatria[parseInt(index)].balance += amount;
+      } else if (type === 'cash') {
+        newData.accounts.cash.balance += amount;
       }
+
       return newData;
     });
   };
 
-  const updateMonthlyDispensed = (amount) => {
+  const updateBudget = (category, amount) => {
     setData(prev => ({
       ...prev,
-      monthlyDispensed: amount,
+      budgets: {
+        ...prev.budgets,
+        [category]: amount,
+      },
+    }));
+  };
+
+  const updateDailyLimit = (limit) => {
+    setData(prev => ({
+      ...prev,
+      dailyLimit: limit,
+    }));
+  };
+
+  const updateFixedExpense = (expense, amount) => {
+    setData(prev => ({
+      ...prev,
+      fixedExpenses: {
+        ...prev.fixedExpenses,
+        [expense]: amount,
+      },
     }));
   };
 
@@ -147,21 +252,14 @@ export const useFinance = () => {
   const getTotalIncome = () => {
     if (!data.transactions || !Array.isArray(data.transactions)) return 0;
     return data.transactions
-      .filter(t => t.type === 'income')
+      .filter(t => t.type === 'income' || (t.type === 'expense' && t.category === 'rushbet' && t.subcategory === 'Ganancias'))
       .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
   };
 
   const getTotalExpense = () => {
     if (!data.transactions || !Array.isArray(data.transactions)) return 0;
     return data.transactions
-      .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  };
-
-  const getTotalLoans = () => {
-    if (!data.transactions || !Array.isArray(data.transactions)) return 0;
-    return data.transactions
-      .filter(t => t.type === 'loan')
+      .filter(t => t.type === 'expense' && t.category !== 'rushbet')
       .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
   };
 
@@ -170,27 +268,34 @@ export const useFinance = () => {
     return Object.values(data.fixedExpenses).reduce((sum, amount) => sum + (parseFloat(amount) || 0), 0);
   };
 
+  const getTotalYield = () => {
+    return data.accounts.nubank.savingsBoxes.reduce((sum, box) => sum + (box.yield || 0), 0);
+  };
+
+  const getMotoExpense = () => {
+    if (!data.transactions || !Array.isArray(data.transactions)) return 0;
+    return data.transactions
+      .filter(t => t.type === 'expense' && t.category === 'moto')
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  };
+
   const getAvailableBalance = () => {
     return getTotalSalary() - getTotalExpense() - getTotalFixedExpenses() - data.monthlyDispensed;
   };
 
-  const getBalance = () => {
-    return getTotalIncome() - getTotalExpense();
-  };
-
   const getTotalAccounts = () => {
+    const nuBankTotal = data.accounts.nubank.savingsBoxes.reduce((sum, box) => sum + box.balance, 0);
     return (
       data.accounts.savings +
-      data.accounts.colpatria.reduce((sum, acc) => sum + acc.balance, 0)
+      data.accounts.nequi.balance +
+      nuBankTotal +
+      data.accounts.colpatria.reduce((sum, acc) => sum + acc.balance, 0) +
+      data.accounts.cash.balance
     );
   };
 
   const getTotalDebt = () => {
     return data.accounts.nubank.creditBalance + data.accounts.companyLoan.balance;
-  };
-
-  const getTotalNuBankSavings = () => {
-    return data.accounts.nubank.savingsBoxes.reduce((sum, box) => sum + box.balance, 0);
   };
 
   const getNetWorth = () => {
@@ -200,12 +305,15 @@ export const useFinance = () => {
   const getExpensesByCategory = () => {
     const categories = {};
     if (!data.transactions || !Array.isArray(data.transactions)) return [];
+
     data.transactions
-      .filter(t => t.type === 'expense')
+      .filter(t => t.type === 'expense' && t.category !== 'rushbet')
       .forEach(t => {
-        const cat = t.category || 'Otros';
-        categories[cat] = (categories[cat] || 0) + parseFloat(t.amount || 0);
+        const catObj = EXPENSE_CATEGORIES[t.category];
+        const catName = catObj ? catObj.name : 'Otros';
+        categories[catName] = (categories[catName] || 0) + parseFloat(t.amount || 0);
       });
+
     return Object.entries(categories).map(([name, value]) => ({
       name,
       value: parseFloat(value.toFixed(2)),
@@ -215,6 +323,7 @@ export const useFinance = () => {
   const getMonthlyData = () => {
     const data_map = {};
     if (!data.transactions || !Array.isArray(data.transactions)) return [];
+
     data.transactions.forEach(t => {
       const date = new Date(t.date);
       const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -222,12 +331,13 @@ export const useFinance = () => {
         data_map[month] = { month, income: 0, expense: 0 };
       }
       const amount = parseFloat(t.amount || 0);
-      if (t.type === 'income') {
+      if (t.type === 'income' || (t.category === 'rushbet' && t.subcategory === 'Ganancias')) {
         data_map[month].income += amount;
       } else if (t.type === 'expense') {
         data_map[month].expense += amount;
       }
     });
+
     return Object.values(data_map).sort((a, b) => a.month.localeCompare(b.month));
   };
 
@@ -236,25 +346,29 @@ export const useFinance = () => {
     salary: data.salary,
     accounts: data.accounts,
     fixedExpenses: data.fixedExpenses,
+    budgets: data.budgets,
+    dailyLimit: data.dailyLimit,
     monthlyDispensed: data.monthlyDispensed,
     loading,
     addTransaction,
     deleteTransaction,
-    editTransaction,
-    updateAccount,
-    updateMonthlyDispensed,
+    addTransfer,
+    updateAccountBalance,
+    updateBudget,
+    updateDailyLimit,
+    updateFixedExpense,
     getTotalSalary,
     getTotalIncome,
     getTotalExpense,
     getTotalFixedExpenses,
-    getTotalLoans,
+    getTotalYield,
+    getMotoExpense,
     getAvailableBalance,
-    getBalance,
     getTotalAccounts,
     getTotalDebt,
-    getTotalNuBankSavings,
     getNetWorth,
     getExpensesByCategory,
     getMonthlyData,
+    EXPENSE_CATEGORIES,
   };
 };
