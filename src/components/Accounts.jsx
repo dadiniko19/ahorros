@@ -11,6 +11,9 @@ export function Accounts({
   onUpdateFixedExpense,
   onUpdateBudget,
   onUpdateDailyLimit,
+  onUpdateNequi,
+  onUpdateCash,
+  onUpdateColpatria,
 }) {
   const [editingAccount, setEditingAccount] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -37,6 +40,13 @@ export function Accounts({
       onUpdateBudget('moto', value);
     } else if (type === 'daily_limit') {
       onUpdateDailyLimit(value);
+    } else if (type === 'nequi') {
+      onUpdateNequi(value);
+    } else if (type === 'cash') {
+      onUpdateCash(value);
+    } else if (type.startsWith('colpatria_')) {
+      const index = parseInt(type.replace('colpatria_', ''));
+      onUpdateColpatria(index, value);
     }
     setEditingAccount(null);
   };
@@ -258,26 +268,94 @@ export function Accounts({
       {/* Nequi */}
       {accounts.nequi && (
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold">N</div>
-            <h3 className="font-bold dark:text-white">Nequi</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold">N</div>
+              <h3 className="font-bold dark:text-white">Nequi</h3>
+            </div>
+            {editingAccount !== 'nequi' && (
+              <button
+                onClick={() => handleEditStart('nequi', accounts.nequi.balance)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              >
+                <Edit2 className="w-4 h-4 text-gray-500" />
+              </button>
+            )}
           </div>
-          <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-            ${accounts.nequi.balance.toLocaleString('es-CO')}
-          </p>
+          {editingAccount === 'nequi' ? (
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                placeholder="Monto"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+              />
+              <button
+                onClick={() => handleSave('nequi')}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
+              >
+                Guardar
+              </button>
+              <button
+                onClick={() => setEditingAccount(null)}
+                className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+              ${accounts.nequi.balance.toLocaleString('es-CO')}
+            </p>
+          )}
         </div>
       )}
 
       {/* Efectivo */}
       {accounts.cash && (
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-2 mb-3">
-            <DollarSign className="w-5 h-5 text-green-500" />
-            <h3 className="font-bold dark:text-white">Efectivo</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-500" />
+              <h3 className="font-bold dark:text-white">Efectivo</h3>
+            </div>
+            {editingAccount !== 'cash' && (
+              <button
+                onClick={() => handleEditStart('cash', accounts.cash.balance)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              >
+                <Edit2 className="w-4 h-4 text-gray-500" />
+              </button>
+            )}
           </div>
-          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-            ${accounts.cash.balance.toLocaleString('es-CO')}
-          </p>
+          {editingAccount === 'cash' ? (
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                placeholder="Monto"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+              />
+              <button
+                onClick={() => handleSave('cash')}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
+              >
+                Guardar
+              </button>
+              <button
+                onClick={() => setEditingAccount(null)}
+                className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              ${accounts.cash.balance.toLocaleString('es-CO')}
+            </p>
+          )}
         </div>
       )}
 
@@ -291,10 +369,44 @@ export function Accounts({
         <div className="space-y-3">
           {accounts.colpatria.map((account, idx) => (
             <div key={idx} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{account.name}</p>
-              <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                ${account.balance.toLocaleString('es-CO')}
-              </p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{account.name}</p>
+                {editingAccount !== `colpatria_${idx}` && (
+                  <button
+                    onClick={() => handleEditStart(`colpatria_${idx}`, account.balance)}
+                    className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                  >
+                    <Edit2 className="w-4 h-4 text-gray-500" />
+                  </button>
+                )}
+              </div>
+              {editingAccount === `colpatria_${idx}` ? (
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    placeholder="Monto"
+                    className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
+                  />
+                  <button
+                    onClick={() => handleSave(`colpatria_${idx}`)}
+                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm transition"
+                  >
+                    Guardar
+                  </button>
+                  <button
+                    onClick={() => setEditingAccount(null)}
+                    className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-2 rounded-lg text-sm transition"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              ) : (
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  ${account.balance.toLocaleString('es-CO')}
+                </p>
+              )}
             </div>
           ))}
         </div>

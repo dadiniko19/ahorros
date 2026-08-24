@@ -12,6 +12,7 @@ export function Dashboard({
   motoBudget = 0,
   dailyLimit = 0,
   totalYield = 0,
+  colpatriaBalance = 0,
 }) {
   const safe = (value) => isNaN(value) ? 0 : value;
 
@@ -56,15 +57,15 @@ export function Dashboard({
           </div>
         )}
 
-        <div className={`${safe(availableBalance) >= 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-orange-50 dark:bg-orange-900/20'} rounded-lg p-4 border ${safe(availableBalance) >= 0 ? 'border-blue-200 dark:border-blue-800' : 'border-orange-200 dark:border-orange-800'}`}>
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Dinero Disponible</p>
-              <p className={`text-2xl font-bold ${safe(availableBalance) >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}>
-                ${safe(availableBalance).toLocaleString('es-CO')}
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                ${safe(colpatriaBalance).toLocaleString('es-CO')}
               </p>
             </div>
-            <Wallet className={`w-8 h-8 ${safe(availableBalance) >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`} />
+            <Wallet className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
 

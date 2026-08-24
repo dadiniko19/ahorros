@@ -59,6 +59,19 @@ const EXPENSE_CATEGORIES = {
       'Ganancias',
     ],
   },
+  viajes_revoo: {
+    name: '✈️ Viajes Revoo',
+    subcategories: [
+      'Impuesto hoteles',
+      'Compras en ara',
+      'D1',
+      'Oxxo',
+    ],
+  },
+  entre_cuentas: {
+    name: '🔄 Entre Cuentas',
+    subcategories: [],
+  },
 };
 
 const DEFAULT_STATE = {
@@ -245,6 +258,44 @@ export const useFinance = () => {
     }));
   };
 
+  const updateNequi = (amount) => {
+    setData(prev => ({
+      ...prev,
+      accounts: {
+        ...prev.accounts,
+        nequi: {
+          ...prev.accounts.nequi,
+          balance: amount,
+        },
+      },
+    }));
+  };
+
+  const updateCash = (amount) => {
+    setData(prev => ({
+      ...prev,
+      accounts: {
+        ...prev.accounts,
+        cash: {
+          ...prev.accounts.cash,
+          balance: amount,
+        },
+      },
+    }));
+  };
+
+  const updateColpatria = (index, amount) => {
+    setData(prev => ({
+      ...prev,
+      accounts: {
+        ...prev.accounts,
+        colpatria: prev.accounts.colpatria.map((acc, i) =>
+          i === index ? { ...acc, balance: amount } : acc
+        ),
+      },
+    }));
+  };
+
   const getTotalSalary = () => {
     return data.salary.base + data.salary.bonus;
   };
@@ -357,6 +408,9 @@ export const useFinance = () => {
     updateBudget,
     updateDailyLimit,
     updateFixedExpense,
+    updateNequi,
+    updateCash,
+    updateColpatria,
     getTotalSalary,
     getTotalIncome,
     getTotalExpense,

@@ -68,6 +68,7 @@ export default function App() {
                 motoBudget={finance.budgets.moto}
                 dailyLimit={finance.dailyLimit}
                 totalYield={finance.getTotalYield()}
+                colpatriaBalance={finance.accounts.colpatria[0]?.balance || 0}
               />
               <div className="mb-4">
                 <h2 className="text-lg font-bold mb-4 dark:text-white">Últimas Transacciones</h2>
@@ -90,6 +91,9 @@ export default function App() {
               onUpdateFixedExpense={finance.updateFixedExpense}
               onUpdateBudget={finance.updateBudget}
               onUpdateDailyLimit={finance.updateDailyLimit}
+              onUpdateNequi={finance.updateNequi}
+              onUpdateCash={finance.updateCash}
+              onUpdateColpatria={finance.updateColpatria}
             />
           )}
 
