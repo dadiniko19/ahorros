@@ -69,6 +69,11 @@ export default function App() {
                 dailyLimit={finance.dailyLimit}
                 totalYield={finance.getTotalYield()}
                 colpatriaBalance={finance.accounts.colpatria[0]?.balance || 0}
+                fixedExpenses={finance.fixedExpenses}
+                onUpdateSalary={finance.updateSalary}
+                onUpdateCreditBalance={finance.updateCreditBalance}
+                onDeductArriendo={finance.deductArriendo}
+                onDeductFixedExpense={finance.deductFixedExpense}
               />
               <div className="mb-4">
                 <h2 className="text-lg font-bold mb-4 dark:text-white">Últimas Transacciones</h2>
