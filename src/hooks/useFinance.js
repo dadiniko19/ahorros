@@ -99,9 +99,9 @@ const DEFAULT_STATE = {
       ],
     },
     colpatria: [
-      { name: 'Colpatria Cuenta 1', balance: 0 },
-      { name: 'Colpatria Cuenta 2', balance: 0 },
-      { name: 'Colpatria Cuenta 3', balance: 0 },
+      { name: 'Nómina', balance: 0 },
+      { name: 'Bolsillo 1', balance: 0 },
+      { name: 'Bolsillo 2', balance: 0 },
     ],
     cash: {
       name: 'Efectivo',
@@ -312,6 +312,61 @@ export const useFinance = () => {
     }));
   };
 
+  const updateSalary = (base, bonus) => {
+    setData(prev => ({
+      ...prev,
+      salary: {
+        base: parseFloat(base) || 0,
+        bonus: parseFloat(bonus) || 0,
+      },
+      accounts: {
+        ...prev.accounts,
+        colpatria: prev.accounts.colpatria.map((acc, i) =>
+          i === 0 ? { ...acc, balance: (parseFloat(base) || 0) + (parseFloat(bonus) || 0) } : acc
+        ),
+      },
+    }));
+  };
+
+  const updateCreditBalance = (amount) => {
+    setData(prev => ({
+      ...prev,
+      accounts: {
+        ...prev.accounts,
+        nubank: {
+          ...prev.accounts.nubank,
+          creditBalance: amount,
+        },
+      },
+    }));
+  };
+
+  const deductArriendo = () => {
+    setData(prev => ({
+      ...prev,
+      fixedExpenses: {
+        ...prev.fixedExpenses,
+        rent: prev.fixedExpenses.rent,
+      },
+      transactions: [{
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'expense',
+        category: 'outros',
+        subcategory: 'Arriendo',
+        amount: 1500000,
+        paymentMethod: 'Colpatria',
+        description: 'Pago automático de arriendo',
+      }, ...prev.transactions],
+      accounts: {
+        ...prev.accounts,
+        colpatria: prev.accounts.colpatria.map((acc, i) =>
+          i === 0 ? { ...acc, balance: acc.balance - 1500000 } : acc
+        ),
+      },
+    }));
+  };
+
   const getTotalSalary = () => {
     return data.salary.base + data.salary.bonus;
   };
@@ -427,6 +482,9 @@ export const useFinance = () => {
     updateNequi,
     updateCash,
     updateColpatria,
+    updateSalary,
+    updateCreditBalance,
+    deductArriendo,
     getTotalSalary,
     getTotalIncome,
     getTotalExpense,

@@ -31,6 +31,18 @@ export function Dashboard({
           </div>
         </div>
 
+        <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Lo que debes</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                ${safe(totalDebt).toLocaleString('es-CO')}
+              </p>
+            </div>
+            <TrendingDown className="w-8 h-8 text-red-600 dark:text-red-400" />
+          </div>
+        </div>
+
 
         <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
           <div className="flex items-center justify-between">
