@@ -284,12 +284,21 @@ export function TransactionForm({ onAdd, isOpen, onClose }) {
             </>
           )}
 
-          <button
-            type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition"
-          >
-            Agregar {isLoan ? 'Préstamo' : 'Transacción'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition"
+            >
+              Agregar {isLoan ? 'Préstamo' : 'Transacción'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-lg transition"
+            >
+              Cancelar
+            </button>
+          </div>
         </form>
       </div>
     </div>
