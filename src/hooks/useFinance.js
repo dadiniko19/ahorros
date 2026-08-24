@@ -190,10 +190,42 @@ export const useFinance = () => {
   };
 
   const deleteTransaction = (id) => {
-    setData(prev => ({
-      ...prev,
-      transactions: prev.transactions.filter(t => t.id !== id),
-    }));
+    setData(prev => {
+      const transaction = prev.transactions.find(t => t.id === id);
+      if (!transaction) {
+        return { ...prev, transactions: prev.transactions.filter(t => t.id !== id) };
+      }
+
+      let newData = {
+        ...prev,
+        transactions: prev.transactions.filter(t => t.id !== id),
+      };
+
+      if (transaction.type === 'expense') {
+        newData.accounts.colpatria[0].balance += transaction.amount;
+      } else if (transaction.type === 'payment') {
+        newData.accounts.colpatria[0].balance += transaction.amount;
+        newData.accounts.nubank.creditBalance += transaction.amount;
+      } else if (transaction.type === 'transfer') {
+        const updateBalance = (accountId, amount) => {
+          const [type, index] = accountId.split('_');
+          if (type === 'nu') {
+            newData.accounts.nubank.savingsBoxes[parseInt(index)].balance += amount;
+          } else if (type === 'nequi') {
+            newData.accounts.nequi.balance += amount;
+          } else if (type === 'colpatria') {
+            newData.accounts.colpatria[parseInt(index)].balance += amount;
+          } else if (type === 'cash') {
+            newData.accounts.cash.balance += amount;
+          }
+        };
+
+        updateBalance(transaction.fromAccount, transaction.amount);
+        updateBalance(transaction.toAccount, -transaction.amount);
+      }
+
+      return newData;
+    });
   };
 
   const addTransfer = (transfer) => {
