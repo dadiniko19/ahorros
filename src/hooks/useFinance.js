@@ -201,11 +201,23 @@ export const useFinance = () => {
         transactions: prev.transactions.filter(t => t.id !== id),
       };
 
-      if (transaction.type === 'expense') {
-        newData.accounts.colpatria[0].balance += transaction.amount;
-      } else if (transaction.type === 'payment') {
-        newData.accounts.colpatria[0].balance += transaction.amount;
-        newData.accounts.nubank.creditBalance += transaction.amount;
+      if (transaction.type === 'expense' || transaction.type === 'payment') {
+        const { paymentMethod, amount } = transaction;
+        if (paymentMethod === 'Nequi') {
+          newData.accounts.nequi.balance += amount;
+        } else if (paymentMethod === 'Efectivo') {
+          newData.accounts.cash.balance += amount;
+        } else if (paymentMethod === 'Colpatria') {
+          newData.accounts.colpatria[0].balance += amount;
+        } else if (paymentMethod === 'NU') {
+          if (newData.accounts.nubank.savingsBoxes[0]) {
+            newData.accounts.nubank.savingsBoxes[0].balance += amount;
+          }
+        }
+
+        if (transaction.type === 'payment') {
+          newData.accounts.nubank.creditBalance += amount;
+        }
       } else if (transaction.type === 'transfer') {
         const updateBalance = (accountId, amount) => {
           const [type, index] = accountId.split('_');

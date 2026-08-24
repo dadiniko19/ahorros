@@ -170,9 +170,9 @@ export function Dashboard({
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Dinero Disponible (Nómina)</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Dinero Disponible Total</p>
               <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                ${safe(colpatriaBalance).toLocaleString('es-CO')}
+                ${safe(totalSalary).toLocaleString('es-CO')}
               </p>
             </div>
             <Wallet className="w-8 h-8 text-blue-600 dark:text-blue-400" />
