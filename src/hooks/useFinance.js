@@ -115,11 +115,11 @@ const DEFAULT_STATE = {
   },
   fixedExpenses: {
     rent: 1500000,
-    cuotaPadres: 0,
-    spotify: 0,
-    claro: 0,
+    cuotaPadres: 70000,
+    spotify: 10100,
+    claro: 49077,
     icloud: 0,
-    didi: 0,
+    didi: 18900,
     rappi: 0,
   },
   budgets: {
