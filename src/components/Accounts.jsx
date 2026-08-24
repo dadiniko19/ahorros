@@ -14,6 +14,10 @@ export function Accounts({
   onUpdateNequi,
   onUpdateCash,
   onUpdateColpatria,
+  onUpdateSalary,
+  onUpdateCreditBalance,
+  onDeductArriendo,
+  onDeductFixedExpense,
 }) {
   const [editingAccount, setEditingAccount] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -53,6 +57,7 @@ export function Accounts({
 
   const FIXED_EXPENSE_LABELS = {
     rent: 'Arriendo',
+    cuotaPadres: 'Cuota Padres',
     spotify: 'Spotify',
     claro: 'Claro',
     icloud: 'iCloud',
@@ -191,6 +196,56 @@ export function Accounts({
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-4 border-t border-gray-200 dark:border-gray-600 pt-3">
           Total Fijo: <span className="font-bold">${totalFixedExpenses.toLocaleString('es-CO')}</span>
         </p>
+      </div>
+
+      {/* Fijos con botones de deducción rápida */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <h3 className="font-bold mb-4 dark:text-white">Fijos con Deducción Rápida</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {/* Cuota Padres */}
+          {fixedExpenses.cuotaPadres > 0 && (
+            <button
+              onClick={() => onDeductFixedExpense('cuotaPadres', fixedExpenses.cuotaPadres)}
+              className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg p-4 transition text-center"
+            >
+              <p className="text-sm opacity-90">Cuota Padres</p>
+              <p className="text-lg font-bold mt-1">${fixedExpenses.cuotaPadres.toLocaleString('es-CO')}</p>
+            </button>
+          )}
+
+          {/* Spotify */}
+          {fixedExpenses.spotify > 0 && (
+            <button
+              onClick={() => onDeductFixedExpense('spotify', fixedExpenses.spotify)}
+              className="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-4 transition text-center"
+            >
+              <p className="text-sm opacity-90">Spotify</p>
+              <p className="text-lg font-bold mt-1">${fixedExpenses.spotify.toLocaleString('es-CO')}</p>
+            </button>
+          )}
+
+          {/* Claro */}
+          {fixedExpenses.claro > 0 && (
+            <button
+              onClick={() => onDeductFixedExpense('claro', fixedExpenses.claro)}
+              className="bg-gradient-to-br from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-lg p-4 transition text-center"
+            >
+              <p className="text-sm opacity-90">Claro</p>
+              <p className="text-lg font-bold mt-1">${fixedExpenses.claro.toLocaleString('es-CO')}</p>
+            </button>
+          )}
+
+          {/* Didi */}
+          {fixedExpenses.didi > 0 && (
+            <button
+              onClick={() => onDeductFixedExpense('didi', fixedExpenses.didi)}
+              className="bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg p-4 transition text-center"
+            >
+              <p className="text-sm opacity-90">Didi</p>
+              <p className="text-lg font-bold mt-1">${fixedExpenses.didi.toLocaleString('es-CO')}</p>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Presupuesto de Moto */}

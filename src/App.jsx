@@ -94,6 +94,10 @@ export default function App() {
               onUpdateNequi={finance.updateNequi}
               onUpdateCash={finance.updateCash}
               onUpdateColpatria={finance.updateColpatria}
+              onUpdateSalary={finance.updateSalary}
+              onUpdateCreditBalance={finance.updateCreditBalance}
+              onDeductArriendo={finance.deductArriendo}
+              onDeductFixedExpense={finance.deductFixedExpense}
             />
           )}
 

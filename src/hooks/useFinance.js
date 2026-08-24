@@ -115,6 +115,7 @@ const DEFAULT_STATE = {
   },
   fixedExpenses: {
     rent: 1500000,
+    cuotaPadres: 0,
     spotify: 0,
     claro: 0,
     icloud: 0,
@@ -344,15 +345,11 @@ export const useFinance = () => {
   const deductArriendo = () => {
     setData(prev => ({
       ...prev,
-      fixedExpenses: {
-        ...prev.fixedExpenses,
-        rent: prev.fixedExpenses.rent,
-      },
       transactions: [{
         id: Date.now(),
         date: new Date().toISOString(),
         type: 'expense',
-        category: 'outros',
+        category: 'otros',
         subcategory: 'Arriendo',
         amount: 1500000,
         paymentMethod: 'Colpatria',
@@ -362,6 +359,28 @@ export const useFinance = () => {
         ...prev.accounts,
         colpatria: prev.accounts.colpatria.map((acc, i) =>
           i === 0 ? { ...acc, balance: acc.balance - 1500000 } : acc
+        ),
+      },
+    }));
+  };
+
+  const deductFixedExpense = (expenseKey, amount) => {
+    setData(prev => ({
+      ...prev,
+      transactions: [{
+        id: Date.now(),
+        date: new Date().toISOString(),
+        type: 'expense',
+        category: 'otros',
+        subcategory: expenseKey.charAt(0).toUpperCase() + expenseKey.slice(1),
+        amount,
+        paymentMethod: 'Colpatria',
+        description: `Pago automático de ${expenseKey}`,
+      }, ...prev.transactions],
+      accounts: {
+        ...prev.accounts,
+        colpatria: prev.accounts.colpatria.map((acc, i) =>
+          i === 0 ? { ...acc, balance: acc.balance - amount } : acc
         ),
       },
     }));
